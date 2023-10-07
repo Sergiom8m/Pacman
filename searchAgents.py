@@ -484,6 +484,7 @@ class FoodSearchProblem:
     def getCostOfActions(self, actions):
         """Returns the cost of a particular sequence of actions.  If those actions
         include an illegal move, return 999999"""
+
         x, y = self.getStartState()[0]
         cost = 0
         for action in actions:
