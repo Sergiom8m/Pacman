@@ -300,7 +300,8 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0  # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
-        "*** YOUR CODE HERE ***"
+
+
         self.costFn = costFn
         self.visitedcorners = (False, False, False, False)
 
@@ -534,11 +535,33 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    position, foodGrid = state
     "*** YOUR CODE HERE ***"
 
-    return 0
+    position, foodGrid = state
+    unvisitedFood = foodGrid.asList()
 
+    if len(unvisitedFood) == 0:
+        return 0
+
+    heuristic = 0
+
+    for i in range(len(unvisitedFood)):
+
+        distances = []
+        for food in unvisitedFood:
+            distances.append(util.manhattanDistance(position, food))
+
+        food_index = distances.index(max(distances))
+
+        food_distance = distances[food_index]
+
+        if food_distance > heuristic:
+            heuristic = food_distance
+
+        position = unvisitedFood[food_index]
+        del unvisitedFood[food_index]
+
+    return heuristic
 
 class ClosestDotSearchAgent(SearchAgent):
     """Search for all food using a sequence of searches"""
@@ -564,30 +587,27 @@ class ClosestDotSearchAgent(SearchAgent):
         """
         # Here are some useful elements of the startState
         startPosition = gameState.getPacmanPosition()
-        food = gameState.getFood()
-        walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        # BREADTH FIRST ALGORITHM
 
-        estadoInicial = startPosition
-        visitados = set()
-        cola = util.Queue()
-        cola.push((estadoInicial, []))
+        initialState = startPosition
+        visitedNodes = set()
+        queue = util.Queue()
+        queue.push((initialState, []))
 
-        while not cola.isEmpty():
-            estadoAct, acciones = cola.pop()
+        while not queue.isEmpty():
+            actualState, actions = queue.pop()
 
-            if problem.isGoalState(estadoAct):
-                return acciones
+            if problem.isGoalState(actualState):
+                return actions
 
-            if estadoAct not in visitados:
-                visitados.add(estadoAct)
-                sucesores = problem.getSuccessors(estadoAct)
+            if actualState not in visitedNodes:
+                visitedNodes.add(actualState)
+                successors = problem.getSuccessors(actualState)
 
-                for sucesor, accion, _ in sucesores:
-                    cola.push((sucesor, acciones + [accion]))
+                for successor, action, _ in successors:
+                    queue.push((successor, actions + [action]))
 
         return []
 
